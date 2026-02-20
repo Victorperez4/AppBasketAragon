@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tfg_appfede/config/common/resources/colores.dart';
+import 'Registro.dart';
+import 'Inicio.dart';
 
 class InicioSesionPage extends StatefulWidget {
   const InicioSesionPage({super.key});
@@ -14,20 +17,21 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
   bool mostrarPassword = false;
 
   @override
+  void dispose() {
+    // Liberar recursos de los controladores
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFB71C1C),
-              Color(0xFFE65100),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+          gradient: AppColors.gradienteAragon,
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -35,9 +39,9 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Botón atrás
+                // Botón atrás (opcional si hay navegación previa)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back, color: AppColors.blanco),
                   onPressed: () => Navigator.pop(context),
                 ),
 
@@ -46,31 +50,31 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 // Logo + título
                 Center(
                   child: Column(
-                    
-                    children:[
-                      ClipPath(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(35),
                         child: Image.asset(
-                          'assets/images/Logo.png',
+                          'assets/images/LogoFAB.png',
                           width: 180,
                           height: 180,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      SizedBox(height: 10),
-                      Text(
+                      const SizedBox(height: 10),
+                      const Text(
                         "FEDERACIÓN ARAGONESA DE BASKET",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.blanco,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 30),
-                      Text(
+                      const SizedBox(height: 30),
+                      const Text(
                         "INICIAR SESIÓN",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.blanco,
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
@@ -85,7 +89,7 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 TextField(
                   controller: emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.blanco),
                   decoration: _inputDecoration("Correo Electrónico"),
                 ),
 
@@ -95,14 +99,14 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 TextField(
                   controller: passCtrl,
                   obscureText: !mostrarPassword,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.blanco),
                   decoration: _inputDecoration("Contraseña").copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         mostrarPassword
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        color: Colors.white70,
+                        color: AppColors.blancoOpacidad70,
                       ),
                       onPressed: () {
                         setState(() => mostrarPassword = !mostrarPassword);
@@ -117,10 +121,12 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // TODO: Implementar recuperación de contraseña
+                    },
                     child: const Text(
                       "¿Olvidaste tu contraseña?",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.blanco),
                     ),
                   ),
                 ),
@@ -132,17 +138,17 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow[700],
+                      backgroundColor: AppColors.naranja,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: _handleLogin,
                     child: const Text(
                       "INICIAR SESIÓN",
                       style: TextStyle(
-                        color: Colors.black,
+                        color: AppColors.blanco,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -150,17 +156,40 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
+
+                // Divisor
+                const Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.blancoOpacidad54)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'O',
+                        style: TextStyle(color: AppColors.blanco),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: AppColors.blancoOpacidad54)),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
 
                 // Botones Google / Facebook
                 _socialButton(
                   text: "Continuar con Google",
                   icon: Icons.g_mobiledata,
+                  onPressed: () {
+                    // TODO: Implementar login con Google
+                  },
                 ),
                 const SizedBox(height: 12),
                 _socialButton(
                   text: "Continuar con Facebook",
                   icon: Icons.facebook,
+                  onPressed: () {
+                    // TODO: Implementar login con Facebook
+                  },
                 ),
 
                 const SizedBox(height: 30),
@@ -168,13 +197,41 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 // Registro
                 Center(
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      // Navegar a pantalla de registro
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RegistroPage()),
+                      );
+                    },
                     child: const Text(
                       "¿No tienes cuenta? REGÍSTRATE",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.blanco,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Botón de invitado
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      // Navegar a la app como invitado (funcionalidad limitada)
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const InicioPage()),
+                      );
+                    },
+                    child: const Text(
+                      "Continuar como invitado",
+                      style: TextStyle(
+                        color: AppColors.blancoOpacidad70,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -189,36 +246,72 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
     );
   }
 
-  // --- Widgets auxiliares ---
-
+  /// Decoración de los campos de entrada
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white70),
+      labelStyle: const TextStyle(color: AppColors.blancoOpacidad70),
       enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.white54),
+        borderSide: BorderSide(color: AppColors.blancoOpacidad54),
       ),
       focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.white),
+        borderSide: BorderSide(color: AppColors.blanco),
       ),
     );
   }
 
-  Widget _socialButton({required String text, required IconData icon}) {
+  /// Widget de botón de redes sociales
+  Widget _socialButton({
+    required String text,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.white),
+          side: const BorderSide(color: AppColors.blanco),
           padding: const EdgeInsets.symmetric(vertical: 14),
         ),
-        onPressed: () {},
-        icon: Icon(icon, color: Colors.white),
+        onPressed: onPressed,
+        icon: Icon(icon, color: AppColors.blanco),
         label: Text(
           text,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColors.blanco),
         ),
       ),
     );
+  }
+
+  /// Manejar el inicio de sesión
+  void _handleLogin() {
+    // Validaciones básicas
+    if (emailCtrl.text.isEmpty || passCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor completa todos los campos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // TODO: Implementar lógica de autenticación con la base de datos
+    // Por ahora solo mostramos un mensaje de éxito y navegamos
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Inicio de sesión exitoso'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 1),
+      ),
+    );
+
+    // Navegar a la pantalla de inicio
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const InicioPage()),
+      );
+    });
   }
 }
