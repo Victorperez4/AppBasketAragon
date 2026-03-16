@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
+import 'package:tfg_appfede/data/gestorFavoritos.dart';
 import 'package:tfg_appfede/widgets/BarraInferior.dart';
+import 'package:tfg_appfede/widgets/Header.dart';
+import 'package:tfg_appfede/widgets/MenuLateral.dart';
 import 'Clasificacion.dart';
 
 class LigasPage extends StatefulWidget {
@@ -11,7 +14,6 @@ class LigasPage extends StatefulWidget {
 }
 
 class _LigasPageState extends State<LigasPage> {
-  // Categorías de edad
   final List<String> _categoriasEdad = [
     'Seleccionar categoría...',
     'Prebenjamín',
@@ -23,35 +25,35 @@ class _LigasPageState extends State<LigasPage> {
     'Junior',
     'Senior',
   ];
-  
-  // Categorías de nivel
+
   final List<String> _categoriasNivel = [
     'Seleccionar nivel...',
     'Categoría A',
     'Categoría B',
     'Categoría C',
   ];
-  
+
   String _categoriaEdadSeleccionada = 'Seleccionar categoría...';
   String _categoriaNivelSeleccionada = 'Seleccionar nivel...';
-  
-  // Datos de ejemplo de ligas favoritas
-  final List<Map<String, dynamic>> _ligasFavoritas = [
-    {
-      'categoriaEdad': 'Senior',
-      'categoriaNivel': 'Categoría A',
-      'nombre': 'Senior A',
-    },
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    // De momento, simulamos que cada categoría favorita tiene nombre "Edad Nivel"
+    final ligasFavoritas = FavoritosManager()
+        .categoriasFavoritas
+        .map((nombre) => {
+              'nombre': nombre,
+              'categoriaEdad': nombre.split(' ').first,
+              'categoriaNivel': nombre.split(' ').length > 1
+                  ? nombre.split(' ').sublist(1).join(' ')
+                  : '',
+            })
+        .toList();
+
     return Scaffold(
+      drawer: const MenuLateral(),
+      appBar: const HeaderApp(titulo: "Ligas"),
+      bottomNavigationBar: const BarraInferior(selectedIndex: 0),
       body: Container(
         decoration: const BoxDecoration(
           gradient: AppColors.gradienteAragon,
@@ -59,17 +61,12 @@ class _LigasPageState extends State<LigasPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header
-              _buildHeader(),
-              
-              // Contenido principal
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Título de selección
                       const Text(
                         'Selecciona una liga',
                         style: TextStyle(
@@ -78,10 +75,7 @@ class _LigasPageState extends State<LigasPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      
                       const SizedBox(height: 20),
-                      
-                      // Desplegable de categoría de edad
                       _buildDropdown(
                         label: 'Categoría por edad',
                         value: _categoriaEdadSeleccionada,
@@ -89,16 +83,14 @@ class _LigasPageState extends State<LigasPage> {
                         onChanged: (value) {
                           setState(() {
                             _categoriaEdadSeleccionada = value!;
-                            // Reset nivel cuando cambia la edad
-                            _categoriaNivelSeleccionada = 'Seleccionar nivel...';
+                            _categoriaNivelSeleccionada =
+                                'Seleccionar nivel...';
                           });
                         },
                       ),
-                      
                       const SizedBox(height: 16),
-                      
-                      // Desplegable de categoría de nivel (solo visible si hay edad seleccionada)
-                      if (_categoriaEdadSeleccionada != 'Seleccionar categoría...')
+                      if (_categoriaEdadSeleccionada !=
+                          'Seleccionar categoría...')
                         _buildDropdown(
                           label: 'Categoría por nivel',
                           value: _categoriaNivelSeleccionada,
@@ -107,8 +99,7 @@ class _LigasPageState extends State<LigasPage> {
                             setState(() {
                               _categoriaNivelSeleccionada = value!;
                             });
-                            
-                            // Navegar a la clasificación si ambas están seleccionadas
+
                             if (value != 'Seleccionar nivel...') {
                               Navigator.push(
                                 context,
@@ -122,16 +113,14 @@ class _LigasPageState extends State<LigasPage> {
                             }
                           },
                         ),
-                      
                       const SizedBox(height: 30),
-                      
-                      // Sección de ligas favoritas
-                      if (_ligasFavoritas.isNotEmpty) ...[
+                      if (ligasFavoritas.isNotEmpty) ...[
                         Row(
-                          children: [
-                            const Icon(Icons.star, color: AppColors.amarilloAragon),
-                            const SizedBox(width: 8),
-                            const Text(
+                          children: const [
+                            Icon(Icons.star,
+                                color: AppColors.amarilloAragon),
+                            SizedBox(width: 8),
+                            Text(
                               'Mis ligas favoritas',
                               style: TextStyle(
                                 color: AppColors.blanco,
@@ -142,9 +131,8 @@ class _LigasPageState extends State<LigasPage> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        
-                        // Cards de ligas favoritas
-                        ..._ligasFavoritas.map((liga) => _buildLigaFavoritaCard(liga)),
+                        ...ligasFavoritas
+                            .map((liga) => _buildLigaFavoritaCard(liga)),
                       ],
                     ],
                   ),
@@ -154,43 +142,9 @@ class _LigasPageState extends State<LigasPage> {
           ),
         ),
       ),
-      bottomNavigationBar: const BarraInferior(selectedIndex: 0),
     );
   }
 
-  /// Header con título
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.negro,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.emoji_events, color: AppColors.naranja, size: 28),
-          SizedBox(width: 12),
-          Text(
-            'LIGAS',
-            style: TextStyle(
-              color: AppColors.blanco,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Desplegable personalizado
   Widget _buildDropdown({
     required String label,
     required String value,
@@ -245,11 +199,9 @@ class _LigasPageState extends State<LigasPage> {
     );
   }
 
-  /// Card de liga favorita
   Widget _buildLigaFavoritaCard(Map<String, dynamic> liga) {
     return GestureDetector(
       onTap: () {
-        // Navegar a la clasificación de esta liga
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -276,7 +228,8 @@ class _LigasPageState extends State<LigasPage> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.emoji_events, color: AppColors.blanco, size: 32),
+            const Icon(Icons.emoji_events,
+                color: AppColors.blanco, size: 32),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -301,7 +254,8 @@ class _LigasPageState extends State<LigasPage> {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, color: AppColors.blanco, size: 16),
+            const Icon(Icons.arrow_forward_ios,
+                color: AppColors.blanco, size: 16),
           ],
         ),
       ),

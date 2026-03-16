@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
+import 'package:tfg_appfede/services/autenticacion_service.dart';
+
 class RegistroPage extends StatefulWidget {
   const RegistroPage({super.key});
 
@@ -11,6 +13,8 @@ class _RegistroPageState extends State<RegistroPage> {
   // Controladores para los campos del formulario
   final TextEditingController nombreCtrl = TextEditingController();
   final TextEditingController apellidosCtrl = TextEditingController();
+  final TextEditingController usernameCtrl = TextEditingController();
+  final TextEditingController licenciaCtrl = TextEditingController();
   final TextEditingController emailCtrl = TextEditingController();
   final TextEditingController passCtrl = TextEditingController();
   final TextEditingController confirmPassCtrl = TextEditingController();
@@ -23,10 +27,10 @@ class _RegistroPageState extends State<RegistroPage> {
   // Tipo de usuario seleccionado
   String tipoUsuario = 'Aficionado';
   final List<String> tiposUsuario = [
+    'Aficionado',
     'Jugador',
     'Entrenador',
     'Árbitro',
-    'Aficionado',
   ];
 
   @override
@@ -34,10 +38,19 @@ class _RegistroPageState extends State<RegistroPage> {
     // Liberar recursos de los controladores
     nombreCtrl.dispose();
     apellidosCtrl.dispose();
+    usernameCtrl.dispose();
+    licenciaCtrl.dispose();
     emailCtrl.dispose();
     passCtrl.dispose();
     confirmPassCtrl.dispose();
     super.dispose();
+  }
+
+  /// Verificar si el rol requiere número de licencia
+  bool get requiereLicencia {
+    return tipoUsuario == 'Jugador' || 
+           tipoUsuario == 'Entrenador' || 
+           tipoUsuario == 'Árbitro';
   }
 
   @override
@@ -69,20 +82,35 @@ class _RegistroPageState extends State<RegistroPage> {
                   child: Column(
                     children: [
                       // Logo de la FAB
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(35),
-                        child: Image.asset(
-                          'assets/images/LogoFAB.png',
-                          width: 140,
-                          height: 140,
-                          fit: BoxFit.cover,
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.gradienteNaranjaAmarillo,
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: Image.asset(
+                            'assets/images/LogoFAB.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.sports_basketball,
+                                  size: 60,
+                                  color: AppColors.blanco,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                       
                       const SizedBox(height: 20),
                       
                       const Text(
-                        'ARAGÓN BASKET',
+                        'CREAR CUENTA',
                         style: TextStyle(
                           color: AppColors.blanco,
                           fontSize: 24,
@@ -94,6 +122,11 @@ class _RegistroPageState extends State<RegistroPage> {
                 ),
 
                 const SizedBox(height: 30),
+
+                // SELECTOR DE ROL (PRIMERO)
+                _buildTipoUsuarioSelector(),
+
+                const SizedBox(height: 24),
 
                 // Campos del formulario
                 _buildTextField(
@@ -113,16 +146,30 @@ class _RegistroPageState extends State<RegistroPage> {
                 const SizedBox(height: 16),
 
                 _buildTextField(
+                  controller: usernameCtrl,
+                  label: 'Nombre de usuario',
+                  icon: Icons.alternate_email,
+                ),
+
+                const SizedBox(height: 16),
+
+                // CAMPO DE LICENCIA (solo para Jugador, Entrenador y Árbitro)
+                if (requiereLicencia) ...[
+                  _buildTextField(
+                    controller: licenciaCtrl,
+                    label: _getLicenciaLabel(),
+                    icon: Icons.badge,
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                _buildTextField(
                   controller: emailCtrl,
                   label: 'Correo Electrónico',
                   icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
-
-                const SizedBox(height: 16),
-
-                // Selector de tipo de usuario
-                _buildTipoUsuarioSelector(),
 
                 const SizedBox(height: 16),
 
@@ -148,7 +195,7 @@ class _RegistroPageState extends State<RegistroPage> {
                 // Confirmar contraseña
                 _buildTextField(
                   controller: confirmPassCtrl,
-                  label: 'Confirmar Contraseña',
+                  label: 'Repite la Contraseña',
                   icon: Icons.lock_outline,
                   obscureText: !mostrarConfirmPassword,
                   suffixIcon: IconButton(
@@ -181,7 +228,7 @@ class _RegistroPageState extends State<RegistroPage> {
                     ),
                     const Expanded(
                       child: Text(
-                        'Acepto los Términos y Condiciones y la Política de Privacidad',
+                        'Acepto los Términos y Condiciones',
                         style: TextStyle(
                           color: AppColors.blanco,
                           fontSize: 12,
@@ -315,47 +362,117 @@ class _RegistroPageState extends State<RegistroPage> {
   /// Selector de tipo de usuario con menú desplegable
   Widget _buildTipoUsuarioSelector() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.blancoOpacidad54),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.badge, color: AppColors.blancoOpacidad70),
-          const SizedBox(width: 12),
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: tipoUsuario,
-                isExpanded: true,
-                dropdownColor: AppColors.negro,
-                style: const TextStyle(color: AppColors.blanco, fontSize: 16),
-                items: tiposUsuario.map((String tipo) {
-                  return DropdownMenuItem<String>(
-                    value: tipo,
-                    child: Text(tipo),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() => tipoUsuario = newValue);
-                  }
-                },
-              ),
-            ),
+        color: AppColors.blanco,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          // Icono de información
-          IconButton(
-            icon: const Icon(Icons.info_outline, color: AppColors.blancoOpacidad70),
-            onPressed: () {
-              _mostrarInfoTipoUsuario();
-            },
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.badge, color: AppColors.naranja, size: 24),
+              const SizedBox(width: 12),
+              const Text(
+                'Selecciona tu rol',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.negro,
+                ),
+              ),
+              const Spacer(),
+              // Icono de información
+              IconButton(
+                icon: const Icon(Icons.info_outline, color: AppColors.naranja),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: _mostrarInfoTipoUsuario,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: tipoUsuario,
+              isExpanded: true,
+              dropdownColor: AppColors.blanco,
+              style: const TextStyle(
+                color: AppColors.negro,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+              icon: const Icon(Icons.arrow_drop_down, color: AppColors.naranja),
+              items: tiposUsuario.map((String tipo) {
+                return DropdownMenuItem<String>(
+                  value: tipo,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getIconForRole(tipo),
+                        color: AppColors.naranja,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(tipo),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    tipoUsuario = newValue;
+                    // Limpiar el campo de licencia si cambia a Aficionado
+                    if (!requiereLicencia) {
+                      licenciaCtrl.clear();
+                    }
+                  });
+                }
+              },
+            ),
           ),
         ],
       ),
     );
+  }
+
+  /// Obtener icono según el rol
+  IconData _getIconForRole(String role) {
+    switch (role) {
+      case 'Jugador':
+        return Icons.sports_basketball;
+      case 'Entrenador':
+        return Icons.sports;
+      case 'Árbitro':
+        return Icons.sports_score;
+      case 'Aficionado':
+        return Icons.favorite;
+      default:
+        return Icons.person;
+    }
+  }
+
+  /// Obtener label del campo de licencia según el rol
+  String _getLicenciaLabel() {
+    switch (tipoUsuario) {
+      case 'Jugador':
+        return 'Número de Licencia de Jugador';
+      case 'Entrenador':
+        return 'Número de Licencia de Entrenador';
+      case 'Árbitro':
+        return 'Número de Licencia Arbitral';
+      default:
+        return 'Número de Licencia';
+    }
   }
 
   /// Botón de redes sociales
@@ -388,10 +505,10 @@ class _RegistroPageState extends State<RegistroPage> {
       builder: (context) => AlertDialog(
         title: const Text('Tipos de Usuario'),
         content: const Text(
-          'Jugador: Necesitarás tu número de licencia\n\n'
-          'Entrenador: Necesitarás tu título de entrenador\n\n'
-          'Árbitro: Necesitarás tu licencia arbitral\n\n'
-          'Aficionado: Acceso como seguidor de equipos',
+          '🏀 Jugador: Necesitarás tu número de licencia de jugador\n\n'
+          '🏆 Entrenador: Necesitarás tu número de licencia de entrenador\n\n'
+          '⚖️ Árbitro: Necesitarás tu número de licencia arbitral\n\n'
+          '❤️ Aficionado: Acceso como seguidor de equipos (no requiere licencia)',
         ),
         actions: [
           TextButton(
@@ -404,12 +521,19 @@ class _RegistroPageState extends State<RegistroPage> {
   }
 
   /// Manejar el registro del usuario
-  void _handleRegistro() {
+  void _handleRegistro() async {
     // Validaciones básicas
     if (nombreCtrl.text.isEmpty || 
         apellidosCtrl.text.isEmpty || 
+        usernameCtrl.text.isEmpty ||
         emailCtrl.text.isEmpty) {
-      _mostrarError('Por favor completa todos los campos');
+      _mostrarError('Por favor completa todos los campos obligatorios');
+      return;
+    }
+
+    // Validar licencia si es requerida
+    if (requiereLicencia && licenciaCtrl.text.isEmpty) {
+      _mostrarError('El número de licencia es obligatorio para ${tipoUsuario}s');
       return;
     }
     
@@ -422,21 +546,43 @@ class _RegistroPageState extends State<RegistroPage> {
       _mostrarError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
+
+    // Validar formato de email
+    if (!emailCtrl.text.contains('@')) {
+      _mostrarError('Por favor ingresa un correo electrónico válido');
+      return;
+    }
     
-    // TODO: Implementar lógica de registro con la base de datos
-    // Por ahora solo mostramos un mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Registro exitoso. Por favor inicia sesión'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
+    // Crear objeto Usuario
+    Usuario nuevoUsuario = Usuario(
+      nombre: nombreCtrl.text,
+      apellidos: apellidosCtrl.text,
+      email: emailCtrl.text,
+      password: passCtrl.text,
+      rol: tipoUsuario,
+      username: usernameCtrl.text,
+      licencia: requiereLicencia ? licenciaCtrl.text : null,
     );
     
-    // Navegar a la pantalla de inicio de sesión
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context);
-    });
+    // Registrar usuario usando el servicio
+    bool registroExitoso = await AutenticacionService.registrarUsuario(nuevoUsuario);
+    
+    if (registroExitoso) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Registro exitoso como $tipoUsuario. Por favor inicia sesión'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      
+      // Navegar a la pantalla de inicio de sesión
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pop(context);
+      });
+    } else {
+      _mostrarError('Error en el registro. El email o usuario ya está registrado.');
+    }
   }
 
   /// Mostrar mensaje de error

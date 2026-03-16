@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
+import 'package:tfg_appfede/screens/InicioApp.dart';
+import 'package:tfg_appfede/services/autenticacion_service.dart';
 import 'Registro.dart';
-import 'Inicio.dart';
 
 class InicioSesionPage extends StatefulWidget {
   const InicioSesionPage({super.key});
@@ -51,13 +52,28 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 Center(
                   child: Column(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(35),
-                        child: Image.asset(
-                          'assets/images/LogoFAB.png',
-                          width: 180,
-                          height: 180,
-                          fit: BoxFit.cover,
+                      Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.gradienteNaranjaAmarillo,
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(35),
+                          child: Image.asset(
+                            'assets/images/LogoFAB.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.sports_basketball,
+                                  size: 80,
+                                  color: AppColors.blanco,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -120,13 +136,16 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 // Olvidaste contraseña
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // TODO: Implementar recuperación de contraseña
-                    },
-                    child: const Text(
-                      "¿Olvidaste tu contraseña?",
-                      style: TextStyle(color: AppColors.blanco),
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: TextButton(
+                      onPressed: () {
+                        // TODO: Implementar recuperación de contraseña
+                      },
+                      child: const Text(
+                        "¿Olvidaste tu contraseña?",
+                        style: TextStyle(color: AppColors.blanco),
+                      ),
                     ),
                   ),
                 ),
@@ -134,23 +153,26 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 const SizedBox(height: 20),
 
                 // Botón iniciar sesión
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.naranja,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.naranja,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    onPressed: _handleLogin,
-                    child: const Text(
-                      "INICIAR SESIÓN",
-                      style: TextStyle(
-                        color: AppColors.blanco,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      onPressed: _handleLogin,
+                      child: const Text(
+                        "INICIAR SESIÓN",
+                        style: TextStyle(
+                          color: AppColors.blanco,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -176,40 +198,49 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                 const SizedBox(height: 20),
 
                 // Botones Google / Facebook
-                _socialButton(
-                  text: "Continuar con Google",
-                  icon: Icons.g_mobiledata,
-                  onPressed: () {
-                    // TODO: Implementar login con Google
-                  },
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: _socialButton(
+                    text: "Continuar con Google",
+                    icon: Icons.g_mobiledata,
+                    onPressed: () {
+                      // TODO: Implementar login con Google
+                    },
+                  ),
                 ),
                 const SizedBox(height: 12),
-                _socialButton(
-                  text: "Continuar con Facebook",
-                  icon: Icons.facebook,
-                  onPressed: () {
-                    // TODO: Implementar login con Facebook
-                  },
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: _socialButton(
+                    text: "Continuar con Facebook",
+                    icon: Icons.facebook,
+                    onPressed: () {
+                      // TODO: Implementar login con Facebook
+                    },
+                  ),
                 ),
 
                 const SizedBox(height: 30),
 
-                // Registro
+                // Registro - CON CURSOR POINTER
                 Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navegar a pantalla de registro
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RegistroPage()),
-                      );
-                    },
-                    child: const Text(
-                      "¿No tienes cuenta? REGÍSTRATE",
-                      style: TextStyle(
-                        color: AppColors.blanco,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Navegar a pantalla de registro
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegistroPage()),
+                        );
+                      },
+                      child: const Text(
+                        "¿No tienes cuenta? REGÍSTRATE",
+                        style: TextStyle(
+                          color: AppColors.blanco,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ),
@@ -219,19 +250,22 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
 
                 // Botón de invitado
                 Center(
-                  child: TextButton(
-                    onPressed: () {
-                      // Navegar a la app como invitado (funcionalidad limitada)
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const InicioPage()),
-                      );
-                    },
-                    child: const Text(
-                      "Continuar como invitado",
-                      style: TextStyle(
-                        color: AppColors.blancoOpacidad70,
-                        fontSize: 14,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: TextButton(
+                      onPressed: () {
+                        // Navegar a la app como invitado (funcionalidad limitada)
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const InicioPage()),
+                        );
+                      },
+                      child: const Text(
+                        "Continuar como invitado",
+                        style: TextStyle(
+                          color: AppColors.blancoOpacidad70,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -284,7 +318,7 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
   }
 
   /// Manejar el inicio de sesión
-  void _handleLogin() {
+  void _handleLogin() async {
     // Validaciones básicas
     if (emailCtrl.text.isEmpty || passCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -296,22 +330,35 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
       return;
     }
 
-    // TODO: Implementar lógica de autenticación con la base de datos
-    // Por ahora solo mostramos un mensaje de éxito y navegamos
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Inicio de sesión exitoso'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 1),
-      ),
+    // Intentar iniciar sesión usando el servicio
+    bool loginExitoso = await AutenticacionService.iniciarSesion(
+      emailCtrl.text,
+      passCtrl.text,
     );
 
-    // Navegar a la pantalla de inicio
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const InicioPage()),
+    if (loginExitoso) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Inicio de sesión exitoso'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
       );
-    });
+
+      // Navegar a la pantalla de inicio
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const InicioPage()),
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email o contraseña incorrectos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

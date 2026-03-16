@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
-
+import 'package:tfg_appfede/data/gestorFavoritos.dart';
 
 class JugadorPage extends StatefulWidget {
   final String nombreJugador;
@@ -19,13 +19,14 @@ class JugadorPage extends StatefulWidget {
 class _JugadorPageState extends State<JugadorPage> {
   bool _esFavorito = false;
 
-  // Datos de ejemplo del jugador (luego vendrán de la BD)
   late final Map<String, dynamic> _jugadorInfo;
   late final List<Map<String, dynamic>> _estadisticasPartidos;
 
   @override
   void initState() {
     super.initState();
+
+    _esFavorito = FavoritosManager().esJugadorFavorito(widget.nombreJugador);
 
     _jugadorInfo = {
       'nombre': widget.nombreJugador,
@@ -89,27 +90,16 @@ class _JugadorPageState extends State<JugadorPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header
               _buildHeader(),
-
-              // Contenido
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Info del jugador
                       _buildInfoJugador(),
-
                       const SizedBox(height: 16),
-
-                      // Promedios
                       _buildPromedios(),
-
                       const SizedBox(height: 16),
-
-                      // Estadísticas por partido
                       _buildEstadisticasPartidos(),
-
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -171,8 +161,11 @@ class _JugadorPageState extends State<JugadorPage> {
               size: 28,
             ),
             onPressed: () {
+              FavoritosManager().toggleJugadorFavorito(widget.nombreJugador);
+
               setState(() {
-                _esFavorito = !_esFavorito;
+                _esFavorito =
+                    FavoritosManager().esJugadorFavorito(widget.nombreJugador);
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -208,7 +201,6 @@ class _JugadorPageState extends State<JugadorPage> {
       ),
       child: Column(
         children: [
-          // Foto del jugador (placeholder)
           Container(
             width: 120,
             height: 120,
@@ -227,10 +219,7 @@ class _JugadorPageState extends State<JugadorPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // Información básica
           _buildInfoRow('Posición', _jugadorInfo['posicion']),
           _buildInfoRow('Altura', _jugadorInfo['altura']),
           _buildInfoRow('Peso', _jugadorInfo['peso']),
@@ -239,7 +228,6 @@ class _JugadorPageState extends State<JugadorPage> {
     );
   }
 
-  /// Fila de información
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -294,8 +282,6 @@ class _JugadorPageState extends State<JugadorPage> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Grid de promedios
           Row(
             children: [
               Expanded(
@@ -340,7 +326,6 @@ class _JugadorPageState extends State<JugadorPage> {
     );
   }
 
-  /// Card de promedio
   Widget _buildPromedioCard(String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -399,15 +384,12 @@ class _JugadorPageState extends State<JugadorPage> {
             ),
           ),
           const SizedBox(height: 12),
-
-          // Lista de partidos
-          ...(_estadisticasPartidos.map((partido) => _buildPartidoCard(partido))),
+          ..._estadisticasPartidos.map((partido) => _buildPartidoCard(partido)),
         ],
       ),
     );
   }
 
-  /// Card de partido
   Widget _buildPartidoCard(Map<String, dynamic> partido) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -419,7 +401,6 @@ class _JugadorPageState extends State<JugadorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Rival y fecha
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -440,8 +421,6 @@ class _JugadorPageState extends State<JugadorPage> {
             ],
           ),
           const SizedBox(height: 8),
-
-          // Estadísticas
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -456,7 +435,6 @@ class _JugadorPageState extends State<JugadorPage> {
     );
   }
 
-  /// Chip de estadística
   Widget _buildStatChip(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

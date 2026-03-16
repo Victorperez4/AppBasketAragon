@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
 import 'package:tfg_appfede/widgets/BarraInferior.dart';
+import 'package:tfg_appfede/widgets/Header.dart';
+import 'package:tfg_appfede/widgets/MenuLateral.dart';
 
 class InicioPage extends StatefulWidget {
   const InicioPage({super.key});
@@ -11,23 +13,29 @@ class InicioPage extends StatefulWidget {
 
 class _InicioPageState extends State<InicioPage> {
   // Datos de ejemplo para la clasificación (luego vendrán de la BD)
-  final List<Map<String, dynamic>> _clasificacion = [
+ /* final List<Map<String, dynamic>> _clasificacion = [
     {'posicion': 1, 'equipo': 'Baloncesto Tarazona', 'puntos': 38},
     {'posicion': 2, 'equipo': 'Kai Zaragoza', 'puntos': 36},
     {'posicion': 3, 'equipo': 'Oliver Basket', 'puntos': 34},
   ];
-  
+
   // Datos de ejemplo para noticias
   final List<Map<String, String>> _noticias = [
     {
       'titulo': 'El Tarazona remonta un emocionante derbi',
       'imagen': 'assets/images/noticia_placeholder.png',
     },
-  ];
+  ];*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Drawer lateral reutilizable
+      drawer: const MenuLateral(),
+
+      // Header reutilizable
+      appBar: const HeaderApp(titulo: "Inicio"),
+
       // Fondo con gradiente de Aragón
       body: Container(
         decoration: const BoxDecoration(
@@ -36,9 +44,6 @@ class _InicioPageState extends State<InicioPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header con saludo y perfil
-              _buildHeader(),
-              
               // Contenido principal con scroll
               Expanded(
                 child: SingleChildScrollView(
@@ -46,18 +51,11 @@ class _InicioPageState extends State<InicioPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Barra de búsqueda
                       _buildSearchBar(),
-                      
                       const SizedBox(height: 20),
-                      
-                      // Sección de clasificación
-                      _buildClasificacionSection(),
-                      
+                      //_buildClasificacionSection(),
                       const SizedBox(height: 24),
-                      
-                      // Sección de noticias
-                      _buildNoticiasSection(),
+                      //_buildNoticiasSection(),
                     ],
                   ),
                 ),
@@ -66,47 +64,9 @@ class _InicioPageState extends State<InicioPage> {
           ),
         ),
       ),
-      
-      // Menú de navegación inferior (widget reutilizable)
-      bottomNavigationBar: const BarraInferior(selectedIndex: 1),
-    );
-  }
 
-  /// Header con saludo personalizado y botón de perfil
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.negro,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Bienvenido, Imanol',
-            style: TextStyle(
-              color: AppColors.blanco,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          // Botón de perfil
-          IconButton(
-            icon: const Icon(Icons.account_circle, color: AppColors.blanco),
-            iconSize: 32,
-            onPressed: () {
-              // TODO: Navegar a pantalla de perfil
-            },
-          ),
-        ],
-      ),
+      // Menú de navegación inferior
+      bottomNavigationBar: const BarraInferior(selectedIndex: 2),
     );
   }
 
@@ -129,7 +89,7 @@ class _InicioPageState extends State<InicioPage> {
   }
 
   /// Sección de clasificación
-  Widget _buildClasificacionSection() {
+  /*Widget _buildClasificacionSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -142,8 +102,7 @@ class _InicioPageState extends State<InicioPage> {
           ),
         ),
         const SizedBox(height: 12),
-        
-        // Lista de equipos clasificados
+
         Container(
           decoration: BoxDecoration(
             color: AppColors.blanco,
@@ -200,50 +159,49 @@ class _InicioPageState extends State<InicioPage> {
           ),
         ),
         const SizedBox(height: 12),
-        
-        // Cards de noticias
+
         ..._noticias.map((noticia) => Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.blanco,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Imagen de la noticia (placeholder)
-              Container(
-                height: 160,
-                decoration: BoxDecoration(
-                  color: AppColors.grisClaro,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.image,
-                    size: 64,
-                    color: AppColors.blancoOpacidad54,
-                  ),
-                ),
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: AppColors.blanco,
+                borderRadius: BorderRadius.circular(12),
               ),
-              
-              // Título de la noticia
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  noticia['titulo']!,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Imagen de la noticia (placeholder)
+                  Container(
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: AppColors.grisClaro,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 64,
+                        color: AppColors.blancoOpacidad54,
+                      ),
+                    ),
                   ),
-                ),
+
+                  // Título de la noticia
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      noticia['titulo']!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )),
+            )),
       ],
     );
-  }
+  }*/
 }

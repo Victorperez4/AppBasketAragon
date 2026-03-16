@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
+import 'package:tfg_appfede/data/gestorFavoritos.dart';
 import 'package:tfg_appfede/screens/Equipos.dart';
 
 
@@ -21,6 +22,24 @@ class _ClasificacionPageState extends State<ClasificacionPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _esFavorita = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    
+    // Construir el nombre de la categoría
+    final categoriaNombre = '${widget.categoriaEdad} ${widget.categoriaNivel}';
+    
+    // Verificar si ya está en favoritos
+    _esFavorita = FavoritosManager().esCategoriaSfavorita(categoriaNombre);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   // Datos de ejemplo de clasificación (luego vendrán de la BD)
   final List<Map<String, dynamic>> _equipos = [
@@ -97,18 +116,6 @@ class _ClasificacionPageState extends State<ClasificacionPage>
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -178,7 +185,7 @@ class _ClasificacionPageState extends State<ClasificacionPage>
                 ),
                 Text(
                   widget.categoriaNivel,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.blancoOpacidad70,
                     fontSize: 14,
                   ),
@@ -195,11 +202,15 @@ class _ClasificacionPageState extends State<ClasificacionPage>
               size: 28,
             ),
             onPressed: () {
+              // Construir el nombre de la categoría
+              final categoriaNombre = '${widget.categoriaEdad} ${widget.categoriaNivel}';
+              
+              // Alternar favorito
               setState(() {
                 _esFavorita = !_esFavorita;
+                FavoritosManager().toggleCategoriaFavorita(categoriaNombre);
               });
 
-              // TODO: Guardar/eliminar de favoritos en la BD
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(_esFavorita

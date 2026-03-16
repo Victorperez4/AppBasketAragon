@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tfg_appfede/config/common/resources/colores.dart';
-import '../screens/Inicio.dart';
+import 'package:tfg_appfede/screens/Perfil.dart';
+import 'package:tfg_appfede/screens/Tienda.dart';
+import '../screens/InicioApp.dart';
 import '../screens/Ligas.dart';
 import '../screens/Favoritos.dart';
 //import '../screens/Tienda.dart';
@@ -137,14 +139,14 @@ class BarraInferior extends StatelessWidget {
         );
         break;
         
-      /*case 1:
+      case 1:
         // Ir a Tienda
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const TiendaPage()),
         );
         break;
-        */
+        
       case 2:
         // Ir a Inicio
         Navigator.pushReplacement(
@@ -164,18 +166,10 @@ class BarraInferior extends StatelessWidget {
       case 4:
         // Ir a Perfil
         // TODO: Descomentar cuando se cree la pantalla de Perfil
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const PerfilPage()),
-        // );
-        
-        // Mientras tanto, mostrar un mensaje
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Pantalla de Perfil en desarrollo'),
-            duration: Duration(seconds: 1),
-          ),
-        );
+         Navigator.pushReplacement(
+           context,
+           MaterialPageRoute(builder: (context) => const PerfilPage()),
+         );
         break;
     }
   }
